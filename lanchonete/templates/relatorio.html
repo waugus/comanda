@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<body>
+
+<div class="container">
+
+    <h2>{{ titulo }}</h2>
+
+    <!-- RESUMO -->
+    <div class="cards">
+        <div class="card">
+            <i data-lucide="clipboard-list"></i>
+            <h3>{{ resumo.total_comandas or 0 }}</h3>
+            <span>Comandas fechadas</span>
+        </div>
+
+        <div class="card">
+            <i data-lucide="dollar-sign"></i>
+            <h3>R$ {{ "%.2f"|format(resumo.faturamento or 0) }}</h3>
+            <span>Faturamento</span>
+        </div>
+    </div>
+
+    <!-- PRODUTOS -->
+    <h3>🔥 Produtos mais vendidos</h3>
+
+    {% if produtos %}
+    <table>
+        <tr>
+            <th>Produto</th>
+            <th>Qtd</th>
+            <th>Total</th>
+        </tr>
+
+        {% for p in produtos %}
+        <tr>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.quantidade }}</td>
+            <td>R$ {{ "%.2f"|format(p.total) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>Nenhuma venda no período.</p>
+    {% endif %}
+
+    <br>
+    <a href="/" class="btn-voltar">⬅ Voltar</a>
+
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+
+</body>
+</html>

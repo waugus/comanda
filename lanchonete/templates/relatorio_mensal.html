@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+    <title>Relatório Mensal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<body>
+<div class="container">
+
+    <h2>📊 Relatório Mensal</h2>
+
+    <div class="card">
+        <h3>💰 Faturamento</h3>
+        <p>Total do mês: <b>R$ {{ dados.total }}</b></p>
+    </div>
+
+    <div class="card">
+        <h3>🍔 Lanches mais vendidos</h3>
+        <ul>
+            {% for item in dados.lanches %}
+                <li>{{ item.nome }} — {{ item.qtd }} unidades</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>🥤 Bebidas mais vendidas</h3>
+        <ul>
+            {% for item in dados.bebidas %}
+                <li>{{ item.nome }} — {{ item.qtd }} unidades</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>📦 Resumo Geral</h3>
+        <p>Total de vendas: {{ dados.total_vendas }}</p>
+        <p>Ticket médio: R$ {{ dados.ticket_medio }}</p>
+    </div>
+
+    <br>
+    <a href="/" class="btn">⬅ Voltar</a>
+
+</div>
+</body>
+</html>

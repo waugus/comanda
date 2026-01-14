@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Nova Comanda</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<body>
+
+<div class="container">
+
+    <h2>🆕 Criar Comanda</h2>
+
+    <form action="/criar_comanda" method="post">
+
+        <input type="text" name="nome" placeholder="Nome do cliente" required>
+
+        <input type="text" name="cpf" placeholder="CPF" required>
+
+        <button class="btn">Criar</button>
+
+    </form>
+
+    <a class="btn secondary" href="/">⬅ Voltar</a>
+
+</div>
+
+</body>
+</html>

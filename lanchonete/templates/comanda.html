@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+    <title>Comanda</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<body>
+
+<div class="container">
+
+    <h2>🧾 Comanda #{{ comanda.id }}</h2>
+
+    <div class="info-comanda">
+        <p><strong>Cliente:</strong> {{ comanda.cliente }}</p>
+    </div>
+
+    <div class="lista-itens">
+        {% for item in itens %}
+            <div class="item-comanda">
+                <div>
+                    <span class="item-nome">{{ item.nome }}</span>
+                    <span class="item-detalhe">
+                        {{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}
+                    </span>
+                </div>
+
+                <a href="/remover_item/{{ item.id }}/{{ comanda.id }}" class="btn-remover">❌</a>
+            </div>
+        {% endfor %}
+
+        {% if itens|length == 0 %}
+            <p class="vazio">Nenhum item adicionado</p>
+        {% endif %}
+    </div>
+
+    <div class="total-box">
+        <span>Total</span>
+        <span class="total">R$ {{ "%.2f"|format(total) }}</span>
+    </div>
+
+    <a href="/categorias/{{ comanda.id }}" class="btn-principal">
+        ➕ Adicionar itens
+    </a>
+
+    <a href="/" class="btn-voltar">
+        ⬅ Voltar
+    </a>
+
+</div>
+
+</body>
+</html>

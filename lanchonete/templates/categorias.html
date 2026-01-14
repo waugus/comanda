@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+    <title>Categorias</title>
+
+    <!-- CSS CORRETO -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<body>
+
+<div class="categorias-grid">
+    {% for c in categorias %}
+        <a href="/produtos/{{ id }}/{{ c.id }}" class="categoria-card">
+            <img src="{{ url_for('static', filename='img/' ~ c.nome|lower ~ '.jpg') }}">
+            <span>{{ c.nome }}</span>
+        </a>
+    {% endfor %}
+</div>
+
+
+    <a href="/comanda/{{ id }}" class="btn-voltar">⬅ Voltar</a>
+
+</div>
+
+</body>
+</html>

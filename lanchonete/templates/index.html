@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+
+    <!-- ESSENCIAL PARA CELULAR -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Comandas</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
+
+<div class="container">
+
+    <div class="topo">
+        <h2>📋 Comandas Abertas</h2>
+        <div class="toggle" onclick="toggleDark()">🌙</div>
+    </div>
+
+    <a href="/nova" class="btn adicionar">
+        ➕ Nova Comanda
+    </a>
+
+    <hr>
+
+    {% if comandas %}
+        {% for c in comandas %}
+        <div class="item item-comanda">
+
+            <span class="cliente">
+                🧾 {{ c.cliente }}
+            </span>
+
+            <div class="acoes">
+                <a class="btn pequeno" href="/comanda/{{ c.id }}">
+                    Ver
+                </a>
+
+                <a class="btn pequeno fechar"
+                   href="/fechar_comanda/{{ c.id }}"
+                   onclick="return confirm('Deseja fechar esta comanda?')">
+                    Fechar
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma comanda aberta</p>
+    {% endif %}
+
+</div>
+
+<!-- BOTÃO FLUTUANTE RELATÓRIOS -->
+<div class="fab">
+    <button class="fab-main">📊</button>
+    <div class="fab-menu">
+        <a href="/relatorio/dia">📅 Dia</a>
+        <a href="/relatorio/mes">📆 Mês</a>
+        <a href="/relatorio/ano">🗓 Ano</a>
+    </div>
+</div>
+
+<script>
+function toggleDark() {
+    document.body.classList.toggle("dark");
+}
+</script>
+
+<script>
+document.querySelector(".fab-main").onclick = () => {
+    document.querySelector(".fab").classList.toggle("open");
+};
+</script>
+
+</body>
+</html>
