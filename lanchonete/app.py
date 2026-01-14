@@ -373,6 +373,7 @@ def criar_produtos_padrao():
         ("X-Bacon", 20.00, "Lanches"),
 
         ("Coca-Cola", 6.00, "Bebidas"),
+        ("Catuaba Selvagem", 10.00, "Bebidas"),
         ("Guaraná", 5.00, "Bebidas"),
         ("Suco", 7.00, "Bebidas"),
 
