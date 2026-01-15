@@ -1,74 +1,117 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-<meta name="theme-color" content="#1976d2">
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/static/service-worker.js");
-}
-</script>
-
-
 <body>
 
-<div class="container">
+<div class="container relatorio">
 
-    <h2>{{ titulo }}</h2>
+    <div class="header">
+        <h2>{{ titulo }}</h2>
+        <a href="/" class="btn-voltar">⬅ Voltar</a>
+    </div>
 
     <!-- RESUMO -->
     <div class="cards">
         <div class="card">
-            <i data-lucide="clipboard-list"></i>
-            <h3>{{ resumo.total_comandas or 0 }}</h3>
-            <span>Comandas fechadas</span>
+            <div class="card-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
+            <div class="card-content">
+                <h3>{{ resumo.total_comandas or 0 }}</h3>
+                <span>Comandas Fechadas</span>
+            </div>
         </div>
 
         <div class="card">
-            <i data-lucide="dollar-sign"></i>
-            <h3>R$ {{ "%.2f"|format(resumo.faturamento or 0) }}</h3>
-            <span>Faturamento</span>
+            <div class="card-icon">
+                <i data-lucide="dollar-sign"></i>
+            </div>
+            <div class="card-content">
+                <h3>R$ {{ "%.2f"|format(resumo.faturamento or 0) }}</h3>
+                <span>Faturamento Total</span>
+            </div>
         </div>
     </div>
 
-    <!-- PRODUTOS -->
-    <h3>🔥 Produtos mais vendidos</h3>
+    <!-- GRÁFICO E TABELA -->
+    <div class="content-grid">
+        <div class="chart-container">
+            <h3>🏆 Top 10 Produtos Mais Vendidos</h3>
+            <canvas id="graficoProdutos"></canvas>
+        </div>
 
-    {% if produtos %}
-    <table>
-        <tr>
-            <th>Produto</th>
-            <th>Qtd</th>
-            <th>Total</th>
-        </tr>
-
-        {% for p in produtos %}
-        <tr>
-            <td>{{ p.nome }}</td>
-            <td>{{ p.quantidade }}</td>
-            <td>R$ {{ "%.2f"|format(p.total) }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-        <p>Nenhuma venda no período.</p>
-    {% endif %}
-
-    <br>
-    <a href="/" class="btn-voltar">⬅ Voltar</a>
+        <div class="tabela-container">
+            <h3>📋 Lista de Produtos</h3>
+            {% if produtos %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Qtd. Vendida</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.quantidade }}</td>
+                        <td>R$ {{ "%.2f"|format(p.total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="aviso">Nenhuma venda registrada no período.</p>
+            {% endif %}
+        </div>
+    </div>
 
 </div>
 
 <script>
-  lucide.createIcons();
+    lucide.createIcons();
+
+    {% if nomes_produtos %}
+    const ctx = document.getElementById('graficoProdutos').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ nomes_produtos|tojson }},
+            datasets: [{
+                label: 'Quantidade Vendida',
+                data: {{ quantidades_produtos|tojson }},
+                backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                borderColor: 'rgba(39, 174, 96, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    {% endif %}
 </script>
 
 </body>
