@@ -454,11 +454,18 @@ def relatorio(tipo):
 
     con.close()
 
+    # Preparar dados para o gráfico
+    top_10_produtos = produtos[:10]
+    nomes_produtos = [p["nome"] for p in top_10_produtos]
+    quantidades_produtos = [p["quantidade"] for p in top_10_produtos]
+
     return render_template(
         "relatorio.html",
         titulo=titulo,
         resumo=resumo,
-        produtos=produtos
+        produtos=produtos,
+        nomes_produtos=nomes_produtos,
+        quantidades_produtos=quantidades_produtos
     )
 
 # ===============================
