@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="topo">
+        <h2>✏️ Editar Produto</h2>
+        <a href="{{ url_for('gerenciar_produtos') }}" class="btn-voltar">⬅ Voltar</a>
+    </div>
+
+    <form method="post" class="form-card" enctype="multipart/form-data">
+        <div class="form-grupo">
+            <label for="nome">Nome do Produto</label>
+            <input type="text" id="nome" name="nome" value="{{ produto.nome }}" required>
+        </div>
+
+        <div class="form-grupo">
+            <label for="preco">Preço (R$)</label>
+            <input type="number" step="0.01" id="preco" name="preco" value="{{ produto.preco }}" required>
+        </div>
+
+        <div class="form-grupo">
+            <label for="categoria_id">Categoria</label>
+            <select id="categoria_id" name="categoria_id" required>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}" {% if categoria.id == produto.categoria_id %}selected{% endif %}>
+                        {{ categoria.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-grupo">
+            <label for="acrescimos">Acréscimos Disponíveis</label>
+            <select id="acrescimos" name="acrescimos" multiple>
+                {% for acrescimo in acrescimos %}
+                <option value="{{ acrescimo.id }}" {% if acrescimo.id in produto_acrescimos %}selected{% endif %}>
+                    {{ acrescimo.nome }} (+ R$ {{ "%.2f"|format(acrescimo.preco) }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-grupo">
+            <label>Imagem Atual</label>
+            {% if produto.imagem %}
+                <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}" alt="{{ produto.nome }}" width="100">
+            {% else %}
+                <p>Nenhuma imagem.</p>
+            {% endif %}
+        </div>
+
+        <div class="form-grupo">
+            <label for="imagem">Nova Imagem (deixe em branco para manter a atual)</label>
+            <input type="file" id="imagem" name="imagem" accept="image/*">
+        </div>
+
+        <div class="form-grupo">
+            <label>
+                <input type="checkbox" name="destaque" {% if produto.destaque %}checked{% endif %}>
+                Marcar como produto em destaque
+            </label>
+        </div>
+
+        <button type="submit" class="btn">Salvar Alterações</button>
+    </form>
+
+</div>
+
+</body>
+</html>

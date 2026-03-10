@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Editar Categoria</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>✏️ Editar Categoria</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        <label>Nome</label>
+        <input type="text" name="nome" value="{{ categoria.nome }}" required>
+
+        <label>Imagem</label>
+        <input type="file" name="imagem" accept="image/*">
+
+        {% if categoria.imagem %}
+            <p>Imagem atual:</p>
+            <img class="categoria-preview" src="{{ url_for('static', filename='uploads/' + categoria.imagem) }}" alt="{{ categoria.nome }}">
+        {% endif %}
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+    <a href="{{ url_for('gerenciar_categorias') }}" class="btn-voltar">⬅ Voltar</a>
+</div>
+
+</body>
+</html>

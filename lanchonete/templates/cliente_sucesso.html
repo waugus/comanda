@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Pedido enviado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="pedido-modern">
+
+<div class="container">
+    <div class="pedido-sucesso">
+        <h2>✅ Pedido enviado</h2>
+        <p>Anote o numero para acompanhar com a equipe.</p>
+        <p><strong>Numero do pedido:</strong> #{{ pedido_id }}</p>
+        <a class="btn-adicionar" href="{{ url_for('cliente_cardapio') }}">Fazer novo pedido</a>
+        <a class="btn-voltar" href="{{ url_for('cliente_index') }}">⬅ Voltar ao inicio</a>
+    </div>
+</div>
+
+</body>
+</html>

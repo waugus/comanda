@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Acréscimos{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container">
+        <h2>⚙️ Gerenciar Acréscimos</h2>
+        <a href="{{ url_for('adicionar_acrescimo') }}" class="btn adicionar">
+            ➕ Adicionar Acréscimo
+        </a>
+        <br><br>
+        {% if acrescimos %}
+        <ul class="lista-geral">
+            {% for acrescimo in acrescimos %}
+            <li>
+                <div class="info-produto">
+                    <div class="detalhes-produto">
+                        <span class="nome">{{ acrescimo.nome }}</span>
+                        <span class="preco">R$ {{ "%.2f"|format(acrescimo.preco) }}</span>
+                    </div>
+                </div>
+                <div class="botoes-direita">
+                    <a href="{{ url_for('editar_acrescimo', id=acrescimo.id) }}" class="btn pequeno">Editar</a>
+                    <a href="{{ url_for('excluir_acrescimo', id=acrescimo.id) }}" class="btn pequeno fechar" onclick="return confirm('Tem certeza que deseja excluir este acréscimo?')">Excluir</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhum acréscimo cadastrado.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

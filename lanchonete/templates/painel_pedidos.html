@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Painel de Pedidos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="painel-container">
+    <div class="painel-header">
+        <h2>📟 Pedidos Online</h2>
+        <div class="painel-contador">
+            Ativos: <span id="contador-ativos">{{ ativos }}</span>
+        </div>
+    </div>
+
+    <div id="lista-pedidos" class="painel-lista"></div>
+</div>
+
+<script>
+let ultimoId = null;
+
+function tocarAlerta() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.value = 880;
+    gain.gain.value = 0.05;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+}
+
+function formatarItem(item) {
+    const personalizacoes = item.personalizacoes || [];
+    let html = `
+        <div class="painel-item">
+            <div>
+                <strong>${item.nome}</strong>
+                <div class="painel-item-detalhe">${item.qtd} x R$ ${item.preco.toFixed(2)}</div>
+            </div>
+    `;
+    if (personalizacoes.length > 0) {
+        html += "<ul class=\"painel-personalizacoes\">";
+        personalizacoes.forEach((p) => {
+            html += `<li>${p}</li>`;
+        });
+        html += "</ul>";
+    }
+    html += "</div>";
+    return html;
+}
+
+function renderPedidos(data) {
+    const pedidos = data.pedidos || [];
+    const lista = document.getElementById("lista-pedidos");
+    document.getElementById("contador-ativos").textContent = data.ativos || 0;
+
+    if (pedidos.length === 0) {
+        lista.innerHTML = "<p class=\"painel-vazio\">Nenhum pedido online.</p>";
+        return;
+    }
+
+    let html = "";
+    let maxId = 0;
+    pedidos.forEach((p) => {
+        if (p.id > maxId) maxId = p.id;
+        const classe = p.status === "Recebido" ? "painel-card pedido-novo" : "painel-card";
+        html += `
+            <div class="${classe}">
+                <div class="painel-card-topo">
+                    <div>
+                        <strong>Pedido #${p.id}</strong>
+                        <div class="painel-status">${p.status}</div>
+                        <div class="painel-dados">
+                            ${p.nome} • ${p.telefone} • ${p.tipo}
+                        </div>
+                        ${p.tipo === "Entrega" && p.bairro ? `<div class="painel-dados">Bairro: ${p.bairro} • Taxa: R$ ${(p.taxa_entrega || 0).toFixed(2)}</div>` : ""}
+                        ${p.tipo === "Entrega" && p.endereco ? `<div class="painel-endereco">${p.endereco}</div>` : ""}
+                    </div>
+                    <div class="painel-hora">${p.criado_em || ""}</div>
+                </div>
+                <div class="painel-itens">
+                    ${p.itens.map(formatarItem).join("")}
+                </div>
+                <div class="painel-acoes">
+                    <button onclick="atualizarStatus(${p.id}, 'Recebido')">Recebido</button>
+                    <button onclick="atualizarStatus(${p.id}, 'Em preparo')">Em preparo</button>
+                    <button onclick="atualizarStatus(${p.id}, 'Pronto')">Pronto</button>
+                    <button onclick="atualizarStatus(${p.id}, 'Entregue')">Entregue</button>
+                </div>
+            </div>
+        `;
+    });
+
+    lista.innerHTML = html;
+
+    if (ultimoId !== null && maxId > ultimoId) {
+        tocarAlerta();
+    }
+    ultimoId = maxId;
+}
+
+function carregarPedidos() {
+    fetch("{{ url_for('painel_pedidos_dados') }}")
+        .then((res) => res.json())
+        .then(renderPedidos)
+        .catch(() => {});
+}
+
+function atualizarStatus(id, status) {
+    const formData = new URLSearchParams();
+    formData.append("status", status);
+    fetch(`/painel_pedidos/status/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString()
+    }).then(carregarPedidos);
+}
+
+carregarPedidos();
+setInterval(carregarPedidos, 5000);
+</script>
+
+</body>
+</html>

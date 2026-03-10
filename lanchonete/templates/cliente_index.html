@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ponto Certo Lanches - Pedido Online</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cliente_home.css') }}">
+</head>
+<body class="cliente-home">
+    <header class="home-topbar">
+        <div class="home-brand">Ponto Certo Lanches</div>
+        <nav class="home-nav">
+            <a class="active" href="{{ url_for('cliente_cardapio') }}">Cardápio</a>
+            <a href="{{ url_for('cliente_cardapio') }}">Meus Pedidos</a>
+            <a href="{{ url_for('cliente_carrinho') }}">Carrinho</a>
+        </nav>
+        <a class="home-cart" href="{{ url_for('cliente_carrinho') }}">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-badge">{{ cart_count or 0 }}</span>
+        </a>
+    </header>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <h1>O melhor lanche<br>da cidade</h1>
+                <a class="hero-btn" href="{{ url_for('cliente_cardapio') }}">Ver Cardápio</a>
+            </div>
+            <div class="hero-image" aria-hidden="true"></div>
+        </div>
+    </section>
+
+    <section class="highlights">
+        <div class="highlights-header">🔥 Destaques do Menu</div>
+        <div class="highlight-grid">
+            {% if destaques %}
+                {% for p in destaques %}
+                <article class="highlight-card">
+                    {% if p.imagem %}
+                    <div class="highlight-img" style="background-image: url('{{ url_for('static', filename='uploads/' + p.imagem) }}');"></div>
+                    {% else %}
+                    <div class="highlight-img"></div>
+                    {% endif %}
+                    <div class="highlight-body">
+                        <h3>{{ p.nome }}</h3>
+                        <p>Produto em destaque</p>
+                        <div class="highlight-price">R$ {{ "%.2f"|format(p.preco) }}</div>
+                        <a class="highlight-btn" href="{{ url_for('cliente_categoria', categoria_id=p.categoria_id) }}">Ver no cardápio</a>
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <p>Sem destaques cadastrados no momento.</p>
+            {% endif %}
+        </div>
+    </section>
+</body>
+</html>

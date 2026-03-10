@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cliente_shop.css') }}">
+</head>
+<body class="cliente-home">
+
+<header class="home-topbar">
+    <div class="home-brand">Ponto Certo Lanches</div>
+    <nav class="home-nav">
+        <a href="{{ url_for('cliente_index') }}">Início</a>
+        <a class="active" href="{{ url_for('cliente_cardapio') }}">Cardápio</a>
+        <a href="{{ url_for('cliente_carrinho') }}">Carrinho</a>
+    </nav>
+    <a class="home-cart" href="{{ url_for('cliente_carrinho') }}">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge">{{ cart_count or 0 }}</span>
+    </a>
+</header>
+
+<main class="shop-page">
+    <section class="shop-hero">
+        <h1>Cardápio</h1>
+        <p>Escolha uma categoria para montar seu pedido.</p>
+    </section>
+
+    <div class="produtos-grid">
+        {% for c in categorias %}
+        <a class="produto-card" href="{{ url_for('cliente_categoria', categoria_id=c.id) }}">
+            {% if c.imagem %}
+                <img src="{{ url_for('static', filename='uploads/' + c.imagem) }}" alt="{{ c.nome }}">
+            {% else %}
+                <div class="imagem-placeholder-grande"></div>
+            {% endif %}
+            <h3>{{ c.nome }}</h3>
+        </a>
+        {% endfor %}
+    </div>
+</main>
+
+</body>
+</html>

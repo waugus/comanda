@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Pedido recebido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="pedido-modern">
+
+<div class="container">
+    <div class="pedido-sucesso">
+        <h2>✅ Pedido recebido</h2>
+        <p>Seu pedido foi enviado com sucesso.</p>
+        <p><strong>Numero do pedido:</strong> #{{ pedido_id }}</p>
+        <a class="btn-adicionar" href="{{ url_for('pedido_index') }}">Fazer novo pedido</a>
+    </div>
+</div>
+
+</body>
+</html>

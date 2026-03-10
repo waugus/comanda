@@ -1,20 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-
-    <!-- MOBILE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Sistema{% endblock %}</title>
-
-    <!-- CSS GLOBAL -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js");
+}
+</script>
+
 
 <body>
 
-{% block content %}{% endblock %}
+    <header>
+        <div class="container">
+            <a href="/"><h1>Comanda Fácil</h1></a>
+            <nav>
+                {% if session.get('logado') %}
+                    <a href="{{ url_for('index') }}">Comandas</a>
+
+                    {% if session.get('tipo') == 'gerente' %}
+                        <a href="{{ url_for('gerenciar_produtos') }}">Produtos</a>
+                        <a href="{{ url_for('gerenciar_acrescimos') }}">Acréscimos</a>
+                        <a href="{{ url_for('relatorio', tipo='dia') }}">Relatórios</a>
+                    {% endif %}
+
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Comanda Fácil</p>
+        </div>
+    </footer>
 
 </body>
 </html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Entregas - Motoboy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="painel-container">
+    <div class="painel-header">
+        <h2>🏍️ Entregas</h2>
+        <div class="painel-contador">
+            Abertas: <span id="contador-entregas">{{ pedidos|length }}</span>
+        </div>
+    </div>
+
+    <div id="lista-entregas" class="painel-lista">
+        {% if pedidos %}
+            {% for p in pedidos %}
+            <div class="painel-card">
+                <div class="painel-card-topo">
+                    <div>
+                        <strong>Pedido #{{ p.id }}</strong>
+                        <div class="painel-status">{{ p.status }}</div>
+                        <div class="painel-dados">{{ p.nome }} • {{ p.telefone }}</div>
+                        {% if p.bairro %}
+                            <div class="painel-dados">Bairro: {{ p.bairro }} • Taxa: R$ {{ "%.2f"|format(p.taxa_entrega or 0) }}</div>
+                        {% endif %}
+                        {% if p.endereco %}
+                            <div class="painel-endereco">{{ p.endereco }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="painel-hora">{{ p.criado_em or "" }}</div>
+                </div>
+                <div class="painel-itens">
+                    {% for item in p.itens %}
+                        <div class="painel-item">
+                            <div>
+                                <strong>{{ item.nome }}</strong>
+                                <div class="painel-item-detalhe">{{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}</div>
+                            </div>
+                            {% if item.personalizacoes %}
+                                <ul class="painel-personalizacoes">
+                                    {% for pers in item.personalizacoes %}
+                                        <li>{{ pers }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="painel-vazio">Nenhuma entrega pendente.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function formatarItem(item) {
+    const personalizacoes = item.personalizacoes || [];
+    let html = `
+        <div class="painel-item">
+            <div>
+                <strong>${item.nome}</strong>
+                <div class="painel-item-detalhe">${item.qtd} x R$ ${item.preco.toFixed(2)}</div>
+            </div>
+    `;
+    if (personalizacoes.length > 0) {
+        html += "<ul class=\"painel-personalizacoes\">";
+        personalizacoes.forEach((p) => {
+            html += `<li>${p}</li>`;
+        });
+        html += "</ul>";
+    }
+    html += "</div>";
+    return html;
+}
+
+function renderEntregas(data) {
+    const pedidos = data.pedidos || [];
+    const lista = document.getElementById("lista-entregas");
+    document.getElementById("contador-entregas").textContent = pedidos.length;
+
+    if (pedidos.length === 0) {
+        lista.innerHTML = "<p class=\"painel-vazio\">Nenhuma entrega pendente.</p>";
+        return;
+    }
+
+    let html = "";
+    pedidos.forEach((p) => {
+        html += `
+            <div class="painel-card">
+                <div class="painel-card-topo">
+                    <div>
+                        <strong>Pedido #${p.id}</strong>
+                        <div class="painel-status">${p.status}</div>
+                        <div class="painel-dados">${p.nome} • ${p.telefone}</div>
+                        ${p.bairro ? `<div class=\"painel-dados\">Bairro: ${p.bairro} • Taxa: R$ ${(p.taxa_entrega || 0).toFixed(2)}</div>` : ""}
+                        ${p.endereco ? `<div class=\"painel-endereco\">${p.endereco}</div>` : ""}
+                    </div>
+                    <div class="painel-hora">${p.criado_em || ""}</div>
+                </div>
+                <div class="painel-itens">
+                    ${p.itens.map(formatarItem).join("")}
+                </div>
+            </div>
+        `;
+    });
+
+    lista.innerHTML = html;
+}
+
+function carregarEntregas() {
+    fetch("{{ url_for('motoboy_dados') }}")
+        .then((res) => res.json())
+        .then(renderEntregas)
+        .catch(() => {});
+}
+
+carregarEntregas();
+setInterval(carregarEntregas, 5000);
+</script>
+
+</body>
+</html>

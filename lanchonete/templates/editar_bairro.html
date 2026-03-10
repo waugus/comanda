@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Editar Bairro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>✏️ Editar Bairro</h2>
+
+    <form method="post">
+        <label>Nome</label>
+        <input type="text" name="nome" value="{{ bairro.nome }}" required>
+
+        <label>Taxa de entrega (R$)</label>
+        <input type="text" name="taxa" value="{{ '%.2f'|format(bairro.taxa or 0) }}" required>
+
+        <label>Tempo de entrega</label>
+        <input type="text" name="tempo_entrega" value="{{ bairro.tempo_entrega or '' }}" placeholder="Ex: 35-50 min">
+
+        <label>Tempo de retirada</label>
+        <input type="text" name="tempo_retirada" value="{{ bairro.tempo_retirada or '' }}" placeholder="Ex: 15-25 min">
+
+        <label class="check-row">
+            <input type="checkbox" name="ativo" {% if bairro.ativo %}checked{% endif %}>
+            Ativo
+        </label>
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+    <a href="{{ url_for('gerenciar_bairros') }}" class="btn-voltar">⬅ Voltar</a>
+</div>
+
+</body>
+</html>
