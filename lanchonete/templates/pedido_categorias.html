@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Pedido Online</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="pedido-modern">
+
+<div class="pedido-app">
+    <header class="pedido-header">
+        <div class="pedido-header-brand">
+            <div class="pedido-brand-icon"><span class="material-symbols-rounded">delivery_dining</span></div>
+            <div>
+                <h1>Pedido Online</h1>
+                <p class="pedido-status"><span></span>Aberto para pedidos</p>
+            </div>
+        </div>
+        <div class="pedido-header-actions">
+            <a class="pedido-link" href="{{ url_for('pedido_index') }}"><span class="material-symbols-rounded">storefront</span> Categorias</a>
+            <a class="pedido-cta" href="{{ url_for('pedido_carrinho') }}"><span class="material-symbols-rounded">shopping_bag</span> Carrinho ({{ cart_count }})</a>
+        </div>
+    </header>
+
+    <section class="pedido-hero">
+        <div>
+            <h2>Escolha uma categoria</h2>
+            <p>Explore o cardápio e encontre o seu pedido ideal.</p>
+        </div>
+        <div class="pedido-hero-actions">
+            <span class="pedido-badge">Ofertas do dia</span>
+            <span class="pedido-badge">Entrega rápida</span>
+        </div>
+    </section>
+
+    <main class="pedido-content">
+        <section class="pedido-list">
+            <div class="pedido-list-header">
+                <h3>Categorias</h3>
+                <span class="pedido-count">{{ categorias|length }} opções</span>
+            </div>
+            <div class="pedido-grid">
+                {% for c in categorias %}
+                <a class="pedido-card pedido-card-link" href="{{ url_for('pedido_categoria', categoria_id=c.id) }}">
+                    <div class="pedido-card-media">
+                        {% if c.imagem %}
+                            <img src="{{ url_for('static', filename='uploads/' + c.imagem) }}" alt="{{ c.nome }}">
+                        {% else %}
+                            <div class="imagem-placeholder-grande"></div>
+                        {% endif %}
+                    </div>
+                    <div class="pedido-card-body">
+                        <div class="pedido-card-title">
+                            <h4>{{ c.nome }}</h4>
+                        </div>
+                        <p class="pedido-card-desc">Ver produtos disponíveis</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

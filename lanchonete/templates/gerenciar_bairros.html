@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Gerenciar Bairros</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>📍 Lugares (Bairros de Entrega)</h2>
+
+    <a href="{{ url_for('adicionar_bairro') }}" class="btn">➕ Novo Bairro</a>
+
+    {% if bairros %}
+        {% for b in bairros %}
+        <div class="item item-comanda">
+            <div class="bairro-linha">
+                <strong>{{ b.nome }}</strong>
+                <span>Taxa: R$ {{ "%.2f"|format(b.taxa or 0) }}</span>
+                <span>Entrega: {{ b.tempo_entrega or "-" }}</span>
+                <span>Retirada: {{ b.tempo_retirada or "-" }}</span>
+                {% if b.ativo %}
+                    <span class="badge-ok">Ativo</span>
+                {% else %}
+                    <span class="badge-off">Inativo</span>
+                {% endif %}
+            </div>
+            <div class="acoes">
+                <a class="btn pequeno" href="{{ url_for('editar_bairro', id=b.id) }}">Editar</a>
+                <a class="btn pequeno fechar" href="{{ url_for('excluir_bairro', id=b.id) }}"
+                   onclick="return confirm('Deseja excluir este bairro?')">Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum bairro cadastrado</p>
+    {% endif %}
+
+    <a href="/" class="btn-voltar">⬅ Voltar</a>
+</div>
+
+</body>
+</html>

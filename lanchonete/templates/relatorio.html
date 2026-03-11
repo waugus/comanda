@@ -38,6 +38,36 @@
                 <span>Faturamento Total</span>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-icon">
+                <i data-lucide="banknote"></i>
+            </div>
+            <div class="card-content">
+                <h3>R$ {{ "%.2f"|format(pagamentos_por_metodo.Dinheiro or 0) }}</h3>
+                <span>Dinheiro</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">
+                <i data-lucide="credit-card"></i>
+            </div>
+            <div class="card-content">
+                <h3>R$ {{ "%.2f"|format(pagamentos_por_metodo.Cartao or 0) }}</h3>
+                <span>Cartão</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">
+                <i data-lucide="qr-code"></i>
+            </div>
+            <div class="card-content">
+                <h3>R$ {{ "%.2f"|format(pagamentos_por_metodo.Pix or 0) }}</h3>
+                <span>Pix</span>
+            </div>
+        </div>
     </div>
 
     <!-- GRÁFICO E TABELA -->

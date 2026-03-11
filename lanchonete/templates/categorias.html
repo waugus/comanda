@@ -22,7 +22,11 @@ if ("serviceWorker" in navigator) {
 <div class="categorias-grid">
     {% for c in categorias %}
         <a href="/produtos/{{ id }}/{{ c.id }}" class="categoria-card">
-            <img src="{{ url_for('static', filename='img/' ~ c.nome|lower ~ '.jpg') }}">
+            {% if c.imagem %}
+                <img src="{{ url_for('static', filename='uploads/' + c.imagem) }}" alt="{{ c.nome }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/' ~ c.nome|lower ~ '.jpg') }}" alt="{{ c.nome }}">
+            {% endif %}
             <span>{{ c.nome }}</span>
         </a>
     {% endfor %}

@@ -34,6 +34,40 @@ if ("serviceWorker" in navigator) {
         ➕ Nova Comanda
     </a>
 
+    <a href="/cozinha" class="btn">
+        🍳 Tela da Cozinha
+    </a>
+    {% if session.tipo == 'motoboy' %}
+    <a href="/motoboy" class="btn">
+        🏍️ Entregas
+    </a>
+    {% endif %}
+
+    <div class="publico-cta">
+        <div class="publico-cta-text">
+            <strong>Mini site de pedidos para clientes</strong>
+            <span>Link publico para delivery e retirada.</span>
+        </div>
+        <a href="/cliente" class="btn pequeno">
+            Abrir mini site
+        </a>
+    </div>
+
+    {% if session.tipo == 'gerente' %}
+    <a href="{{ url_for('gerenciar_produtos') }}" class="btn">
+        ⚙️ Gerenciar Produtos
+    </a>
+    <a href="{{ url_for('gerenciar_destaques') }}" class="btn">
+        ⭐ Gerenciar Destaques
+    </a>
+    <a href="{{ url_for('gerenciar_categorias') }}" class="btn">
+        🗂️ Gerenciar Categorias
+    </a>
+    <a href="{{ url_for('gerenciar_bairros') }}" class="btn">
+        📍 Gerenciar Lugares (Bairros)
+    </a>
+    {% endif %}
+
     <hr>
 
     {% if comandas %}

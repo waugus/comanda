@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Carrinho</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cliente_shop.css') }}">
+</head>
+<body class="cliente-home">
+
+<header class="home-topbar">
+    <div class="home-brand">Ponto Certo Lanches</div>
+    <nav class="home-nav">
+        <a href="{{ url_for('cliente_index') }}">Início</a>
+        <a href="{{ url_for('cliente_cardapio') }}">Cardápio</a>
+        <a class="active" href="{{ url_for('cliente_carrinho') }}">Carrinho</a>
+    </nav>
+    <a class="home-cart" href="{{ url_for('cliente_carrinho') }}">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge">{{ cart_count or 0 }}</span>
+    </a>
+</header>
+
+<main class="shop-page">
+    <section class="shop-hero">
+        <h1>Carrinho</h1>
+        <p>Revise seus itens antes de finalizar.</p>
+    </section>
+
+    {% if erro %}
+        <div class="pedido-erro">{{ erro }}</div>
+    {% endif %}
+
+    {% if cart|length == 0 %}
+        <p class="pedido-vazio">Seu carrinho está vazio.</p>
+    {% else %}
+        <div class="pedido-carrinho-lista">
+            {% for item in cart %}
+            <div class="pedido-carrinho-item">
+                {% if item.imagem %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.imagem) }}" alt="{{ item.nome }}">
+                {% else %}
+                    <div class="pedido-imagem-placeholder pequeno"></div>
+                {% endif %}
+                <div class="pedido-carrinho-info">
+                    <strong>{{ item.nome }}</strong>
+                    {% if item.destaque_atual %}
+                        <div class="pedido-carrinho-detalhe">⭐ Em destaque</div>
+                    {% endif %}
+                    <div class="pedido-carrinho-detalhe">
+                        {{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}
+                    </div>
+                    {% if item.acrescimos_texto %}
+                        <div class="pedido-acrescimos-texto">Adicionar: {{ item.acrescimos_texto }}</div>
+                    {% endif %}
+                    {% if item.removidos %}
+                    <ul class="pedido-personalizacoes">
+                        {% for r in item.removidos %}
+                        <li>Sem {{ r }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if item.observacao %}
+                        <div class="pedido-obs-texto">Obs: {{ item.observacao }}</div>
+                    {% endif %}
+                </div>
+                <form method="post" action="{{ url_for('cliente_remover', index=loop.index0) }}">
+                    <button class="pedido-remover" type="submit">❌</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="pedido-total linha">
+            <span>Subtotal</span>
+            <strong id="subtotal" data-subtotal="{{ '%.2f'|format(total) }}">R$ {{ "%.2f"|format(total) }}</strong>
+        </div>
+        <div class="pedido-total linha" id="taxa-row">
+            <span>Taxa entrega</span>
+            <strong id="taxa" data-taxa="{{ '%.2f'|format(taxa_entrega or 0) }}">R$ {{ "%.2f"|format(taxa_entrega or 0) }}</strong>
+        </div>
+        <div class="pedido-total">
+            <span>Total</span>
+            <strong id="total-final">R$ {{ "%.2f"|format(total + (taxa_entrega or 0)) }}</strong>
+        </div>
+        <div class="pedido-nota">
+            Entrega: <span id="tempo-entrega">{{ tempo_entrega or "35-50 min" }}</span> | Retirada: <span id="tempo-retirada">{{ tempo_retirada or "15-25 min" }}</span>.
+        </div>
+
+        <form method="post" action="{{ url_for('cliente_finalizar') }}" class="pedido-form">
+            <h3>Dados do cliente</h3>
+            <input type="text" name="nome" placeholder="Nome">
+            <input type="text" name="telefone" placeholder="Telefone">
+            <select name="tipo" id="tipo_pedido" onchange="toggleEndereco()">
+                <option value="">Tipo de pedido</option>
+                <option value="Retirada">Retirada</option>
+                <option value="Entrega">Entrega</option>
+            </select>
+            <select name="bairro_id" id="bairro_pedido">
+                <option value="">Bairro para entrega</option>
+                {% if bairros %}
+                    {% for b in bairros %}
+                        <option value="{{ b.id }}" data-taxa="{{ b.taxa or 0 }}" data-tempo-entrega="{{ b.tempo_entrega or '' }}" data-tempo-retirada="{{ b.tempo_retirada or '' }}" data-bairro="{{ b.nome }}">
+                            {{ b.nome }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="" disabled>Sem bairros cadastrados</option>
+                {% endif %}
+            </select>
+            <div class="endereco-grid">
+                <input type="text" name="rua" id="rua" placeholder="Rua">
+                <input type="text" name="numero" id="numero" placeholder="Numero">
+            </div>
+            <input type="text" name="complemento" id="complemento" placeholder="Complemento (apto, bloco, referencia)">
+
+            <button type="submit" class="btn-adicionar">Finalizar pedido</button>
+        </form>
+    {% endif %}
+</main>
+
+<script>
+function toggleEndereco() {
+    const tipo = document.getElementById("tipo_pedido").value;
+    const rua = document.getElementById("rua");
+    const numero = document.getElementById("numero");
+    const complemento = document.getElementById("complemento");
+    const bairro = document.getElementById("bairro_pedido");
+    rua.style.display = (tipo === "Entrega") ? "block" : "none";
+    rua.required = (tipo === "Entrega");
+    numero.style.display = (tipo === "Entrega") ? "block" : "none";
+    numero.required = (tipo === "Entrega");
+    complemento.style.display = (tipo === "Entrega") ? "block" : "none";
+    bairro.style.display = (tipo === "Entrega") ? "block" : "none";
+    bairro.disabled = (tipo !== "Entrega");
+    if (tipo !== "Entrega") {
+        bairro.value = "";
+    }
+    if (tipo !== "Entrega") {
+        rua.value = "";
+        numero.value = "";
+        complemento.value = "";
+    }
+    atualizarTotal();
+}
+const subtotalEl = document.getElementById("subtotal");
+const taxaEl = document.getElementById("taxa");
+const taxaRow = document.getElementById("taxa-row");
+const totalFinalEl = document.getElementById("total-final");
+const bairroEl = document.getElementById("bairro_pedido");
+const tempoEntregaEl = document.getElementById("tempo-entrega");
+const tempoRetiradaEl = document.getElementById("tempo-retirada");
+
+function atualizarTotal() {
+    const tipo = document.getElementById("tipo_pedido").value;
+    const subtotal = parseFloat(subtotalEl.dataset.subtotal || "0");
+    let taxa = parseFloat(taxaEl.dataset.taxa || "0");
+    const isEntrega = tipo === "Entrega";
+
+    if (isEntrega && bairroEl && bairroEl.value) {
+        const option = bairroEl.options[bairroEl.selectedIndex];
+        const taxaBairro = parseFloat(option.dataset.taxa || "0");
+        taxa = isNaN(taxaBairro) ? 0 : taxaBairro;
+        taxaEl.textContent = `R$ ${taxa.toFixed(2)}`.replace(".", ",");
+        if (tempoEntregaEl) tempoEntregaEl.textContent = option.dataset.tempoEntrega || tempoEntregaEl.textContent;
+        if (tempoRetiradaEl) tempoRetiradaEl.textContent = option.dataset.tempoRetirada || tempoRetiradaEl.textContent;
+    }
+
+    if (taxaRow) taxaRow.style.display = isEntrega ? "flex" : "none";
+    const total = isEntrega ? subtotal + taxa : subtotal;
+    totalFinalEl.textContent = `R$ ${total.toFixed(2)}`.replace(".", ",");
+}
+
+if (bairroEl) {
+    bairroEl.addEventListener("change", atualizarTotal);
+}
+atualizarTotal();
+</script>
+
+</body>
+</html>

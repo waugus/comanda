@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Destaques</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <div class="topo">
+        <h2>⭐ Gerenciar Destaques</h2>
+        <a href="/" class="btn-voltar">⬅ Voltar</a>
+    </div>
+
+    <form action="{{ url_for('salvar_destaques') }}" method="post">
+        <div class="lista-gerenciamento">
+            {% if produtos %}
+                {% for produto in produtos %}
+                <div class="item">
+                    <div class="info-produto">
+                        {% if produto.imagem %}
+                            <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}" alt="{{ produto.nome }}" class="imagem-lista">
+                        {% else %}
+                            <div class="imagem-placeholder"></div>
+                        {% endif %}
+                        <div class="detalhes-produto">
+                            <span class="nome">{{ produto.nome }}</span>
+                            <span class="detalhe">
+                                R$ {{ "%.2f"|format(produto.preco) }} | {{ produto.categoria }}
+                            </span>
+                        </div>
+                    </div>
+                    <label>
+                        <input type="checkbox" name="destaque_ids" value="{{ produto.id }}" {% if produto.destaque %}checked{% endif %}>
+                        Em destaque
+                    </label>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum produto cadastrado.</p>
+            {% endif %}
+        </div>
+
+        {% if produtos %}
+            <button type="submit" class="btn">Salvar Destaques</button>
+        {% endif %}
+    </form>
+</div>
+
+</body>
+</html>

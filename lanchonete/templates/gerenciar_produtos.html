@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Produtos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="topo">
+        <h2>⚙️ Gerenciar Produtos</h2>
+        <a href="/" class="btn-voltar">⬅ Voltar</a>
+    </div>
+
+    <a href="{{ url_for('adicionar_produto') }}" class="btn adicionar">
+        ➕ Adicionar Produto
+    </a>
+
+    <hr>
+
+    <div class="lista-gerenciamento">
+        {% if produtos %}
+            {% for produto in produtos %}
+            <div class="item">
+                <div class="info-produto">
+                    {% if produto.imagem %}
+                        <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}" alt="{{ produto.nome }}" class="imagem-lista">
+                    {% else %}
+                        <div class="imagem-placeholder"></div>
+                    {% endif %}
+                    <div class="detalhes-produto">
+                        <span class="nome">{{ produto.nome }}</span>
+                        <span class="detalhe">
+                            R$ {{ "%.2f"|format(produto.preco) }} | {{ produto.categoria }}
+                        </span>
+                        {% if produto.destaque %}
+                            <span class="detalhe">⭐ Em destaque</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="acoes">
+                    <a href="{{ url_for('editar_produto', id=produto.id) }}" class="btn pequeno">Editar</a>
+                    <a href="{{ url_for('excluir_produto', id=produto.id) }}" class="btn pequeno fechar" onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhum produto cadastrado.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>

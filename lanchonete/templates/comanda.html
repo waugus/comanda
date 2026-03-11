@@ -29,11 +29,48 @@ if ("serviceWorker" in navigator) {
     <div class="lista-itens">
         {% for item in itens %}
             <div class="item-comanda">
-                <div>
-                    <span class="item-nome">{{ item.nome }}</span>
-                    <span class="item-detalhe">
-                        {{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}
-                    </span>
+                <div class="info-produto-comanda">
+                    {% if item.imagem %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.imagem) }}" alt="{{ item.nome }}" class="imagem-lista">
+                    {% else %}
+                        <div class="imagem-placeholder"></div>
+                    {% endif %}
+                    <div>
+                        <span class="item-nome">{{ item.nome }}</span>
+                        <span class="item-detalhe">
+                            {{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}
+                        </span>
+                        {% if item.acrescimos_texto %}
+                        <div class="acrescimos-comanda">
+                            <strong>➕ Adicionar:</strong>
+                            <span>{{ item.acrescimos_texto }}</span>
+                        </div>
+                        {% elif item.acrescimos %}
+                        <div class="acrescimos-comanda">
+                            <strong>Acréscimos:</strong>
+                            <ul>
+                                {% for a in item.acrescimos %}
+                                <li>{{ a.nome }} (+ R$ {{ "%.2f"|format(a.preco) }})</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        {% if item.observacoes_texto %}
+                        <div class="personalizacoes-comanda">
+                            <strong>➖ NÃO colocar:</strong>
+                            <span>{{ item.observacoes_texto }}</span>
+                        </div>
+                        {% elif item.personalizacoes %}
+                        <div class="personalizacoes-comanda">
+                            <strong>Personalizacoes:</strong>
+                            <ul>
+                                {% for p in item.personalizacoes %}
+                                <li>{{ p.texto }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <a href="/remover_item/{{ item.id }}/{{ comanda.id }}" class="btn-remover">❌</a>
@@ -46,13 +83,25 @@ if ("serviceWorker" in navigator) {
     </div>
 
     <div class="total-box">
-        <span>Total</span>
-        <span class="total">R$ {{ "%.2f"|format(total) }}</span>
+        <span>Subtotal</span>
+        <span>R$ {{ "%.2f"|format(subtotal) }}</span>
+    </div>
+    <div class="total-box">
+                    </div>
+    <div class="total-box total-final">
+        <span>Total Geral</span>
+        <span>R$ {{ "%.2f"|format(total) }}</span>
     </div>
 
     <a href="/categorias/{{ comanda.id }}" class="btn-principal">
         ➕ Adicionar itens
     </a>
+
+    {% if comanda.status != 'Paga' %}
+    <a href="{{ url_for('pagar_comanda', id=comanda.id) }}" class="btn-principal pagar">
+        Pagar Comanda (R$ {{ "%.2f"|format(total) }})
+    </a>
+    {% endif %}
 
     <a href="/" class="btn-voltar">
         ⬅ Voltar

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Gerenciar Categorias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>🗂️ Categorias</h2>
+
+    <a href="{{ url_for('adicionar_categoria') }}" class="btn">➕ Nova Categoria</a>
+
+    {% if categorias %}
+        {% for c in categorias %}
+        <div class="item item-comanda">
+            <div class="categoria-linha">
+                {% if c.imagem %}
+                    <img class="categoria-mini" src="{{ url_for('static', filename='uploads/' + c.imagem) }}" alt="{{ c.nome }}">
+                {% else %}
+                    <div class="categoria-mini placeholder"></div>
+                {% endif %}
+                <strong>{{ c.nome }}</strong>
+            </div>
+            <div class="acoes">
+                <a class="btn pequeno" href="{{ url_for('editar_categoria', id=c.id) }}">Editar</a>
+                <a class="btn pequeno fechar" href="{{ url_for('excluir_categoria', id=c.id) }}"
+                   onclick="return confirm('Deseja excluir esta categoria?')">Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma categoria cadastrada</p>
+    {% endif %}
+
+    <a href="/" class="btn-voltar">⬅ Voltar</a>
+</div>
+
+</body>
+</html>

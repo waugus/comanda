@@ -7,12 +7,18 @@ cur = con.cursor()
 usuario = "admin"
 senha = generate_password_hash("1234")
 
-cur.execute("""
-INSERT INTO usuarios (usuario, senha, tipo)
-VALUES (?, ?, ?)
-""", (usuario, senha, "admin"))
+# Check if user already exists
+cur.execute("SELECT * FROM usuarios WHERE usuario = ?", (usuario,))
+existe = cur.fetchone()
 
-con.commit()
+if not existe:
+    cur.execute("""
+    INSERT INTO usuarios (usuario, senha, tipo)
+    VALUES (?, ?, ?)
+    """, (usuario, senha, "admin"))
+    con.commit()
+    print("Usuário criado com sucesso!")
+else:
+    print(f"Usuário '{usuario}' já existe no banco de dados. Nenhuma ação realizada.")
+
 con.close()
-
-print("Usuário criado com sucesso!")

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or "Comanda Express" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cliente.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-mark">CE</span>
+            <div class="brand-text">
+                <strong>Comanda Express</strong>
+                <span>Pedidos rapidos e diretos na cozinha</span>
+            </div>
+        </div>
+        <nav class="topbar-actions">
+            <a href="{{ url_for('cliente_index') }}">Inicio</a>
+            <a href="{{ url_for('cliente_cardapio') }}">Cardapio</a>
+            <a class="cart-link" href="{{ url_for('cliente_carrinho') }}">
+                Carrinho
+                <span class="cart-pill">{{ cart_count or 0 }}</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span>Pagamento na entrega</span>
+            <span>Entrega ou retirada</span>
+            <span>Pedido vai direto pra cozinha</span>
+        </div>
+    </footer>
+</body>
+</html>

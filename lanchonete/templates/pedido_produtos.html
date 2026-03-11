@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="pedido-modern" data-cart-url="{{ url_for('pedido_api_cart') }}" data-uploads-url="{{ url_for('static', filename='uploads/') }}">
+
+<div class="pedido-app">
+    {% set eh_bebida = (categoria.nome|lower == 'bebidas') %}
+    <header class="pedido-header">
+        <div class="pedido-header-brand">
+            <div class="pedido-brand-icon"><span class="material-symbols-rounded">delivery_dining</span></div>
+            <div>
+                <h1>Pedido Online</h1>
+                <p class="pedido-status"><span></span>Aberto para pedidos</p>
+            </div>
+        </div>
+        <div class="pedido-header-actions">
+            <a class="pedido-link" href="{{ url_for('pedido_index') }}"><span class="material-symbols-rounded">storefront</span> Ver categorias</a>
+            <a class="pedido-cta" href="{{ url_for('pedido_carrinho') }}"><span class="material-symbols-rounded">menu_book</span> Ver cardápio</a>
+        </div>
+    </header>
+
+    <section class="pedido-hero">
+        <div>
+            <h2>{{ categoria.nome }}</h2>
+            <p>Escolha seus itens e personalize do seu jeito.</p>
+        </div>
+        <div class="pedido-hero-actions">
+            <span class="pedido-badge">Entrega rápida</span>
+            <span class="pedido-badge">Pagamento fácil</span>
+        </div>
+    </section>
+
+    <main class="pedido-content">
+        <section class="pedido-list">
+            <div class="pedido-list-header">
+                <h3>Produtos da categoria</h3>
+                <span class="pedido-count">{{ produtos|length }} itens</span>
+            </div>
+            <div class="pedido-grid">
+                {% for p in produtos %}
+                <article class="pedido-card">
+                    <div class="pedido-card-media">
+                        {% if p.imagem %}
+                            <img src="{{ url_for('static', filename='uploads/' + p.imagem) }}" alt="{{ p.nome }}">
+                        {% else %}
+                            <div class="imagem-placeholder-grande"></div>
+                        {% endif %}
+                    </div>
+                    <div class="pedido-card-body">
+                        <div class="pedido-card-title">
+                            <h4>{{ p.nome }}</h4>
+                            <span class="pedido-preco">R$ {{ "%.2f"|format(p.preco) }}</span>
+                        </div>
+                        {% if p.destaque %}
+                            <p class="pedido-card-desc">⭐ Produto em destaque</p>
+                        {% else %}
+                        <p class="pedido-card-desc">Preparado na hora, com ingredientes frescos.</p>
+                        {% endif %}
+                        <form method="post" action="{{ url_for('pedido_adicionar') }}" class="pedido-card-form">
+                            <input type="hidden" name="produto_id" value="{{ p.id }}">
+                            <input type="hidden" name="next" value="{{ url_for('pedido_categoria', categoria_id=categoria.id) }}">
+
+                            {% if not eh_bebida %}
+                            <div class="pedido-personalizacao-bloco">
+                                <details class="acrescimos-toggle">
+                                    <summary>Adicionar extras</summary>
+                                    <div class="acrescimos-lista" data-produto="{{ p.id }}">
+                                        {% for a in acrescimos_opcoes %}
+                                        <label class="acrescimo-opcao">
+                                            <input type="checkbox" name="acrescimo_{{ p.id }}" value="{{ a.nome }}|{{ "%.2f"|format(a.preco) }}">
+                                            {{ a.nome }} (+ R$ {{ "%.2f"|format(a.preco) }})
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </details>
+                                <input type="hidden" name="acrescimos_{{ p.id }}" id="acrescimos_texto_{{ p.id }}" value="">
+                                <input type="hidden" name="acrescimo_valor_{{ p.id }}" id="acrescimo_valor_{{ p.id }}" data-base="{{ "%.2f"|format(p.preco) }}" value="0">
+                                <label class="pedido-campo">
+                                    <span>Retirar ingredientes</span>
+                                    <input type="text" name="observacao" placeholder="ex: sem cebola, sem tomate">
+                                </label>
+                                <div class="total-produto">
+                                    Total com acréscimos:
+                                    R$ <span id="total_{{ p.id }}">{{ "%.2f"|format(p.preco) }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="pedido-card-actions">
+                                <div class="qtd-box">
+                                    <button type="button" onclick="alterarQtd('{{ p.id }}', -1)">−</button>
+                                    <input type="number" id="qtd_{{ p.id }}" name="qtd" value="1" min="1">
+                                    <button type="button" onclick="alterarQtd('{{ p.id }}', 1)">+</button>
+                                </div>
+                                <button type="submit" class="btn-adicionar">Adicionar</button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <aside class="pedido-cart">
+            <div class="pedido-cart-header">
+                <div>
+                    <h3>Seu carrinho</h3>
+                    <p>{{ cart_count }} itens</p>
+                </div>
+                <a class="pedido-cart-link" href="{{ url_for('pedido_carrinho') }}">Ver detalhes</a>
+            </div>
+            <div class="pedido-cart-body" id="pedidoCartBody">
+                {% if cart|length == 0 %}
+                <div class="pedido-cart-empty">
+                    <p>Seu carrinho está vazio.</p>
+                    <span>Adicione itens para continuar.</span>
+                </div>
+                {% else %}
+                {% for item in cart %}
+                <div class="pedido-cart-item">
+                    {% if item.imagem %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.imagem) }}" alt="{{ item.nome }}">
+                    {% else %}
+                        <div class="pedido-imagem-placeholder pequeno"></div>
+                    {% endif %}
+                    <div class="pedido-cart-info">
+                        <strong>{{ item.nome }}</strong>
+                        <span>{{ item.qtd }} x R$ {{ "%.2f"|format(item.preco) }}</span>
+                        {% if item.acrescimos_texto %}
+                            <small>Extras: {{ item.acrescimos_texto }}</small>
+                        {% endif %}
+                    </div>
+                    <form method="post" action="{{ url_for('pedido_remover', index=loop.index0) }}">
+                        <button class="pedido-remover" type="submit">✕</button>
+                    </form>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="pedido-cart-footer">
+                <div class="pedido-cart-total">
+                    <span>Total</span>
+                    <strong id="pedidoCartTotal">R$ {{ "%.2f"|format(cart_total or 0) }}</strong>
+                </div>
+                <a class="pedido-cart-checkout" href="{{ url_for('pedido_carrinho') }}">Finalizar pedido</a>
+            </div>
+        </aside>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='pedido.js') }}"></script>
+</body>
+</html>
