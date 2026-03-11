@@ -1674,12 +1674,7 @@ def adicionar_produto():
         con.commit()
         return redirect(url_for("gerenciar_produtos"))
 
-    # Se for GET
-    cur.execute("SELECT * FROM categorias ORDER BY nome")
-    categorias = cur.fetchall()
-    cur.execute("SELECT * FROM acrescimos ORDER BY nome")
-    acrescimos = cur.fetchall()
-    return render_template("adicionar_produto.html", categorias=categorias, acrescimos=acrescimos)
+
 
 
 @app.route("/gerenciar/produtos/editar/<int:id>", methods=["GET", "POST"])
