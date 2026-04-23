@@ -18,7 +18,7 @@ from database import (
 
 
 app = Flask(__name__)
-app.secret_key = "segredo_comanda"
+app.secret_key = os.environ.get("COMANDA_SECRET_KEY", "segredo_comanda")
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['TAXA_ENTREGA'] = 5.00
@@ -351,8 +351,11 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/entrar", methods=["POST"])
+@app.route("/entrar", methods=["GET", "POST"])
 def entrar():
+    if request.method == "GET":
+        return redirect(url_for("login"))
+
     usuario = request.form.get("usuario")
     senha = request.form.get("senha")
 
@@ -1937,8 +1940,48 @@ def relatorio(tipo):
 # ===============================
 
 
+def get_env_str(names, default):
+    for name in names:
+        value = os.environ.get(name)
+        if value is None:
+            continue
+        value = value.strip()
+        if value:
+            return value
+    return default
+
+
+def get_env_int(name, default):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    value = value.strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def get_env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    value = value.strip().lower()
+    if value in {"1", "true", "yes", "y", "on"}:
+        return True
+    if value in {"0", "false", "no", "n", "off"}:
+        return False
+    return default
+
+
 if __name__ == "__main__":
     with app.app_context():
         inicializar_sistema()
         db_inicializado = True
-    app.run(host="0.0.0.0", port=5000)
+    host = get_env_str(["COMANDA_HOST", "HOST"], "0.0.0.0")
+    port = get_env_int("PORT", get_env_int("COMANDA_PORT", 5000))
+    debug = get_env_bool("COMANDA_DEBUG", False)
+    use_reloader = get_env_bool("COMANDA_USE_RELOADER", debug)
+    app.run(host=host, port=port, debug=debug, use_reloader=use_reloader)
