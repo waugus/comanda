@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from functools import wraps
-from database import (
+from .database import (
     get_db_connection, close_connection, migrar_db_imagem,
     migrar_db_destaque_produto,
     migrar_db_status_comanda, migrar_db_imagem_categoria, migrar_db_pagamentos,
